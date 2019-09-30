@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+ver="0.0.1"
+scriptName=`basename $0`
+
+function help()
+{
+  	cat << HELP
+   	$scriptName -- record some trival textual information immediately by using vim and review them later. 
+   	usage: $scriptName [rm | v | b | -h]
+   	options:	
+		rm	remove all records stored.	
+		v	view all records stored.
+		b	add a record while showing all the records stored.
+		-h	show the help document.
+			
+   	example:	
+		$scriptName b  
+				 
+   	version $ver
+
+HELP
+
+   exit 0
+}
+
+function getRecordDir() {
+	homeDir=`cd ~ && pwd`
+	dir=$homeDir/.record
+	if [ ! -d "$dir" ]; then
+  		mkdir $dir 
+	fi
+	echo $dir
+}
+recordDir=`getRecordDir`
+dbFile=$recordDir/record.dat
+tmpFile=$recordDir/tmp
+
+function addRecord() {
+	content=`cat $tmpFile`
+	content=`echo $content | sed -e 's/^[ ]*//g' | sed -e 's/[ ]*$//g'`
+	if [ "$content" = "" ]; then
+		return	
+	fi
+	echo `date` >> $tmpFile
+	echo "" >> $tmpFile
+	chmod 0600 $dbFile
+	cat $dbFile >> $tmpFile
+	cat $tmpFile > $dbFile
+}
+
+function viewRecord() {
+	if [ ! -e "/myfolder" ]; then
+  		touch $dbFile 
+	fi
+	less $dbFile
+}
+
+function clearRecord() {
+	echo "Warning: you're going to remove permanently all contents in record database!"	
+	echo "" > $dbFile
+	echo "Operation has done!"
+}
+
+function editAndView() {
+	echo "" > $tmpFile
+	chmod 0400 $dbFile
+	vim -O $tmpFile $dbFile
+	addRecord
+}
+
+function editOne() {
+	echo "" > $tmpFile
+	chmod 0400 $dbFile
+	vim $tmpFile
+	addRecord
+}
+
+case $1 in
+	rm)
+	clearRecord
+	;;
+	v)
+	viewRecord
+	;;
+	b)
+	editAndView
+	;;
+	-h)
+	help
+	;;
+	*)
+	editOne	
+	;;
+esac
