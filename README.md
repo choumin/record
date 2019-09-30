@@ -1,3 +1,3 @@
-## Record: write down and review trival text immediately.
+## Record: a simplest notepad for Unix-like OS.
 ### What is Record?
-Record is a very simple command to write down some trival textual information immediately by using vim and review them later by using less.
+Record is an extremely simple command to conveniently write down some trival textual information and review them when needed.
