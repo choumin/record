@@ -9,13 +9,14 @@ function help()
    	$scriptName -- record some trival textual information immediately by using vim and review them later. 
    	usage: $scriptName [rm | v | b | -h]
    	options:	
-		rm	remove all records stored.	
-		v	view all records stored.
-		b	add a record while showing all the records stored.
+		-n	add a record.
+		-rm	remove all records stored.
+		-v	view all records stored.
+		-b	add a record while showing all the records stored.
 		-h	show the help document.
 			
    	example:	
-		$scriptName b  
+		$scriptName -b
 				 
    	version $ver
 
@@ -76,20 +77,22 @@ function editOne() {
 	addRecord
 }
 
+[ "$1" = "" ] && help && exit
+
 case $1 in
-	rm)
+	-rm)
 	clearRecord
 	;;
-	v)
+	-v)
 	viewRecord
 	;;
-	b)
+	-b)
 	editAndView
 	;;
 	-h)
 	help
 	;;
-	*)
+	-n)
 	editOne	
 	;;
 esac
