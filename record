@@ -77,6 +77,12 @@ function editOne() {
 	addRecord
 }
 
+function search() {
+	[ "$1" = "" ] && return
+	target=$1
+	grep -in $target $dbFile
+}
+
 [ "$1" = "" ] && help && exit
 
 case $1 in
@@ -95,4 +101,6 @@ case $1 in
 	-n)
 	editOne	
 	;;
+	-s)
+	search "$2"
 esac
