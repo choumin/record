@@ -47,8 +47,7 @@ function addRecord() {
 	if [ "$content" = "" ]; then
 		return	
 	fi
-	echo "record time: "
-	echo `date` >> $tmpFile
+	echo "record time: "`date` >> $tmpFile
 	echo "" >> $tmpFile
 	chmod 0600 $dbFile
 	cat $dbFile >> $tmpFile
