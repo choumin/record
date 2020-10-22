@@ -7,16 +7,19 @@ function help()
 {
   	cat << HELP
    	$scriptName -- record some trival textual information immediately by using vim and review them later. 
-   	usage: $scriptName [rm | v | b | -h]
+	usage: $scriptName [new | rm | view | nv | grep | backup | restore | -h]
    	options:	
-		-n	add a record.
-		-rm	remove all records stored.
-		-v	view all records stored.
-		-b	add a record while showing all the records stored.
-		-h	show the help document.
+		new		add a record.
+		rm		remove all records stored.
+		view		view all records stored.
+		nv		add a record while showing all the records stored.
+		grep		search string in all records.
+		backup		create backup file for current all records.
+		restore		restore all records from last backup file.
+		-h		show the help document.
 			
    	example:	
-		$scriptName -b
+		$scriptName new
 				 
    	version $ver
 
@@ -36,6 +39,7 @@ function getRecordDir() {
 recordDir=`getRecordDir`
 dbFile=$recordDir/record.dat
 tmpFile=$recordDir/tmp
+backupFile=$recordDir/backup.dat
 
 function addRecord() {
 	content=`cat $tmpFile`
@@ -43,6 +47,7 @@ function addRecord() {
 	if [ "$content" = "" ]; then
 		return	
 	fi
+	echo "record time: "
 	echo `date` >> $tmpFile
 	echo "" >> $tmpFile
 	chmod 0600 $dbFile
@@ -51,16 +56,22 @@ function addRecord() {
 }
 
 function viewRecord() {
-	if [ ! -e "/myfolder" ]; then
+	if [ ! -e "$dbFile" ]; then
   		touch $dbFile 
 	fi
 	less $dbFile
 }
 
 function clearRecord() {
-	echo "Warning: you're going to remove permanently all contents in record database!"	
-	echo "" > $dbFile
-	echo "Operation has done!"
+	echo "Warning: you're going to permanently remove all contents in record database!"
+	echo "Are you sure? [Y|N]:"
+	read input
+	if [ "$input" = 'Y' -o "$input" = 'y' ]; then
+		echo "" > $dbFile
+		echo "Records have been cleared."
+		return
+	fi
+	echo "Records have not been cleared."
 }
 
 function editAndView() {
@@ -83,24 +94,48 @@ function search() {
 	grep -in $target $dbFile
 }
 
+function backupRecord() {
+	if [ ! -e "$dbFile" ]; then
+		return
+	fi
+	cp $dbFile $backupFile
+}
+
+function restoreRecord() {
+	if [ ! -e "$backupFile" ]; then
+		return
+	fi
+	cp $backupFile $dbFile
+}
+
 [ "$1" = "" ] && help && exit
 
 case $1 in
-	-rm)
+	rm)
 	clearRecord
 	;;
-	-v)
+	view)
 	viewRecord
 	;;
-	-b)
+	nv)
 	editAndView
 	;;
 	-h)
 	help
 	;;
-	-n)
+	new)
 	editOne	
 	;;
-	-s)
+	grep)
 	search "$2"
+	;;
+	backup)
+	backupRecord
+	;;
+	restore)
+	restoreRecord
+	;;
+	*)
+	help
+	;;
 esac
